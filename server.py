@@ -774,6 +774,16 @@ def punch_game():
     return render_template('punch.html')
 
 
+@app.route('/space')
+def space_game():
+    return render_template('space.html')
+
+
+@app.route('/pong')
+def pong_game():
+    return render_template('pong.html')
+
+
 @app.route('/status')
 def status():
     return jsonify({
