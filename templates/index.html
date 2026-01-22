@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture Radar - Production</title>
+    <meta name="description" content="Detectare gesturi mâinii cu Acconeer A111 + motion gating + TinyCNN">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">📡</span>
+                <h1>Gesture Radar</h1>
+                <span class="version-badge">Production</span>
+            </div>
+            <a href="/games" class="btn btn-game">🎮 Games</a>
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Deconectat</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Radar Visualization -->
+            <section class="radar-section">
+                <div class="section-header">
+                    <h2>Vizualizare Radar</h2>
+                    <div class="controls">
+                        <button id="startBtn" class="btn btn-primary">
+                            <span class="btn-icon">▶</span> Start
+                        </button>
+                        <button id="stopBtn" class="btn btn-secondary" disabled>
+                            <span class="btn-icon">■</span> Stop
+                        </button>
+                        <button id="rebaselineBtn" class="btn btn-warning" disabled>
+                            <span class="btn-icon">🔄</span> Re-Baseline
+                        </button>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="simulateToggle">
+                            <span>Simulare</span>
+                        </label>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="debugToggle">
+                            <span>Debug</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="radar-container">
+                    <canvas id="radarCanvas" width="800" height="250"></canvas>
+                </div>
+                <div class="radar-legend">
+                    <span><strong>Distanță:</strong> 20cm → 55cm</span>
+                    <span id="gateIndicator" class="gate-indicator gate-none">🔴 None</span>
+                </div>
+            </section>
+
+            <!-- Gesture Display: OUT vs RAW -->
+            <section class="gesture-section">
+                <div class="gesture-dual-display">
+                    <!-- OUT (Final Output) -->
+                    <div class="gesture-card gesture-out" id="gestureOutCard">
+                        <div class="card-header">OUTPUT (Final)</div>
+                        <div class="gesture-content">
+                            <div class="gesture-icon" id="gestureOutIcon">✋</div>
+                            <div class="gesture-info">
+                                <h3 id="gestureOutName">În așteptare...</h3>
+                                <span class="confidence-text" id="gestureOutConfidence">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RAW (CNN Output) -->
+                    <div class="gesture-card gesture-raw">
+                        <div class="card-header">RAW (CNN)</div>
+                        <div class="gesture-content">
+                            <div class="gesture-icon gesture-icon-small" id="gestureRawIcon">—</div>
+                            <div class="gesture-info">
+                                <h3 id="gestureRawName">CNN off</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top 3 Classes -->
+                <div class="top3-section">
+                    <h4>Top 3 CNN Predictions</h4>
+                    <div id="top3Container" class="top3-container">
+                        <div class="top3-empty">No CNN data</div>
+                    </div>
+                </div>
+
+                <!-- Gesture Grid -->
+                <div class="gesture-grid">
+                    <div class="gesture-item" data-gesture="none">
+                        <div class="gesture-item-icon">✋</div>
+                        <span>None</span>
+                    </div>
+                    <div class="gesture-item" data-gesture="hold">
+                        <div class="gesture-item-icon">🤚</div>
+                        <span>Hold</span>
+                    </div>
+                    <div class="gesture-item" data-gesture="push">
+                        <div class="gesture-item-icon">👆</div>
+                        <span>Push</span>
+                    </div>
+                    <div class="gesture-item" data-gesture="pull">
+                        <div class="gesture-item-icon">👇</div>
+                        <span>Pull</span>
+                    </div>
+                    <div class="gesture-item" data-gesture="tap">
+                        <div class="gesture-item-icon">👉</div>
+                        <span>Tap</span>
+                    </div>
+                    <div class="gesture-item" data-gesture="wave">
+                        <div class="gesture-item-icon">👋</div>
+                        <span>Wave</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stats Row -->
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-value" id="fpsValue">0</div>
+                    <div class="stat-label">FPS</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="modeValue">-</div>
+                    <div class="stat-label">Mode</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="gateValue">-</div>
+                    <div class="stat-label">Gate</div>
+                </div>
+            </section>
+
+            <!-- Debug Panel (hidden by default) -->
+            <section class="debug-panel" id="debugPanel" style="display: none;">
+                <h4>🔧 Debug Info</h4>
+                <div class="debug-grid">
+                    <div class="debug-item">
+                        <span class="debug-label">Level (lvl):</span>
+                        <span class="debug-value" id="lvlValue">0</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Motion (mot):</span>
+                        <span class="debug-value" id="motValue">0</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Level Thresh:</span>
+                        <span class="debug-value" id="levelThValue">0</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Hold Thresh:</span>
+                        <span class="debug-value" id="holdThValue">0</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Motion Thresh:</span>
+                        <span class="debug-value" id="motionThValue">0</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Motion State:</span>
+                        <span class="debug-value" id="motionStateValue">⚪</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Hold State:</span>
+                        <span class="debug-value" id="holdStateValue">⚪</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>A111 @ 192.168.252.108:6110 • Motion Gating + TinyCNN • Thesis Demo</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

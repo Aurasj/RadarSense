@@ -1,0 +1,380 @@
+/* ============================================
+   Balloon Garden - Game 2 Styles
+   ============================================ */
+
+:root {
+    --bg-dark: #0a0a0f;
+    --bg-card: rgba(20, 20, 30, 0.95);
+    --accent-primary: #6366f1;
+    --accent-green: #10b981;
+    --accent-red: #ef4444;
+    --accent-yellow: #eab308;
+    --accent-pink: #ec4899;
+    --text-primary: #f8fafc;
+    --text-muted: #64748b;
+    --border-color: rgba(100, 100, 150, 0.25);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.game-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: var(--accent-primary);
+}
+
+.game-header h1 {
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, #f97316, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-red);
+}
+
+.connection-status.connected .status-dot {
+    background: var(--accent-green);
+    box-shadow: 0 0 6px var(--accent-green);
+}
+
+/* Controls */
+.controls-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.btn {
+    padding: 0.4rem 0.8rem;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.btn-secondary {
+    background: rgba(100, 100, 150, 0.3);
+    color: var(--text-muted);
+}
+
+.btn-warning {
+    background: #f97316;
+    color: white;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.toggle-label input {
+    accent-color: var(--accent-primary);
+}
+
+/* Game Area */
+.game-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* HUD */
+.hud {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 2rem;
+    padding: 0.5rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+.hud-item {
+    text-align: center;
+}
+
+.hud-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-yellow);
+}
+
+.hud-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+/* Gesture Indicator */
+.gesture-indicator {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.gesture-icon {
+    font-size: 1.5rem;
+}
+
+.gesture-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.gesture-push {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.gesture-pull {
+    border-color: #f97316;
+    background: rgba(249, 115, 22, 0.1);
+}
+
+.gesture-tap {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.gesture-wave {
+    border-color: #ec4899;
+    background: rgba(236, 72, 153, 0.1);
+}
+
+.gesture-hold {
+    border-color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.1);
+}
+
+/* Effect Overlay */
+.effect-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transition: all 0.15s;
+}
+
+.effect-push {
+    background: linear-gradient(to top, transparent, rgba(34, 197, 94, 0.15));
+}
+
+.effect-pull {
+    background: linear-gradient(to bottom, transparent, rgba(249, 115, 22, 0.15));
+}
+
+.effect-tap {
+    background: radial-gradient(circle at center, rgba(99, 102, 241, 0.3), transparent 50%);
+}
+
+.effect-wave {
+    background: radial-gradient(circle at center, rgba(236, 72, 153, 0.2), transparent 70%);
+}
+
+/* Start Overlay */
+.start-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 10, 15, 0.95);
+    gap: 1rem;
+    text-align: center;
+    padding: 2rem;
+}
+
+.start-overlay h2 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, #f97316, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.start-overlay p {
+    color: var(--text-muted);
+    max-width: 400px;
+}
+
+.start-overlay .final-score {
+    font-size: 1.5rem;
+    color: var(--accent-yellow);
+}
+
+.start-hint {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: 1rem;
+}
+
+.gesture-legend {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem 2rem;
+    text-align: left;
+    margin: 1rem 0;
+}
+
+.gesture-legend div {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+
+.gesture-legend span {
+    font-weight: 600;
+    color: var(--accent-primary);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--accent-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Settings */
+.settings-bar {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.setting-item label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.setting-item input[type="range"] {
+    width: 80px;
+    accent-color: var(--accent-primary);
+}
+
+.setting-item span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 30px;
+}
+
+/* Debug Panel */
+.debug-panel {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.4rem;
+    background: rgba(249, 115, 22, 0.1);
+    font-size: 0.65rem;
+    color: var(--accent-yellow);
+}
+
+.debug-panel b {
+    color: var(--text-primary);
+    font-family: monospace;
+}

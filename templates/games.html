@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games Hub - Gesture Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #ec4899, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #6366f1;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .game-card {
+            background: rgba(20, 20, 35, 0.9);
+            border: 2px solid rgba(100, 100, 150, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            border-color: #6366f1;
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+        }
+
+        .game-card.card-1:hover {
+            border-color: #22c55e;
+            box-shadow: 0 20px 40px rgba(34, 197, 94, 0.2);
+        }
+
+        .game-card.card-2:hover {
+            border-color: #f97316;
+            box-shadow: 0 20px 40px rgba(249, 115, 22, 0.2);
+        }
+
+        .game-card.card-3:hover {
+            border-color: #ef4444;
+            box-shadow: 0 20px 40px rgba(239, 68, 68, 0.2);
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-desc {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .game-gestures {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .gesture-tag {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .card-1 .gesture-tag {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+        }
+
+        .card-2 .gesture-tag {
+            background: rgba(249, 115, 22, 0.15);
+            color: #fdba74;
+        }
+
+        .card-3 .gesture-tag {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+        }
+
+        .play-btn {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .card-1 .play-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+
+        .card-2 .play-btn {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+
+        .card-3 .play-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .footer {
+            margin-top: 3rem;
+            color: #64748b;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="/" class="back-link">← Dashboard</a>
+
+    <div class="header">
+        <h1>🎮 Gesture Games</h1>
+        <p>Control games with natural hand gestures using Acconeer A111 radar</p>
+    </div>
+
+    <div class="games-grid">
+        <a href="/game" class="game-card card-1">
+            <div class="game-icon">🎯</div>
+            <h2 class="game-title">Follow the Gesture</h2>
+            <p class="game-desc">Simon Says style - perform the gesture shown on screen. Test your reflexes and
+                accuracy!</p>
+            <div class="game-gestures">
+                <span class="gesture-tag">Hold</span>
+                <span class="gesture-tag">Push</span>
+                <span class="gesture-tag">Pull</span>
+                <span class="gesture-tag">Tap</span>
+                <span class="gesture-tag">Wave</span>
+            </div>
+            <div class="play-btn">Play Now</div>
+        </a>
+
+        <a href="/game2" class="game-card card-2">
+            <div class="game-icon">🎈</div>
+            <h2 class="game-title">Balloon Garden</h2>
+            <p class="game-desc">Control floating balloons with natural movements. Pop, push, pull, and sweep!</p>
+            <div class="game-gestures">
+                <span class="gesture-tag">👆 Lift</span>
+                <span class="gesture-tag">👇 Lower</span>
+                <span class="gesture-tag">👉 Pop</span>
+                <span class="gesture-tag">👋 Sweep</span>
+            </div>
+            <div class="play-btn">Play Now</div>
+        </a>
+
+        <a href="/punch" class="game-card card-3">
+            <div class="game-icon">🥊</div>
+            <h2 class="game-title">Punching Bag</h2>
+            <p class="game-desc">Physical workout game! Punch, push, pull the bag. Build combos and score!</p>
+            <div class="game-gestures">
+                <span class="gesture-tag">👊 Punch</span>
+                <span class="gesture-tag">💪 Shove</span>
+                <span class="gesture-tag">🛡️ Guard</span>
+                <span class="gesture-tag">⚡ Power</span>
+            </div>
+            <div class="play-btn">Play Now</div>
+        </a>
+    </div>
+
+    <div class="footer">
+        <p>Gesture Recognition powered by Acconeer A111 + TinyCNN</p>
+    </div>
+</body>
+
+</html>

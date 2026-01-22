@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Follow the Gesture - Mini Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/game.css">
+</head>
+
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <a href="/" class="back-link">← Dashboard</a>
+            <h1>🎮 Follow the Gesture</h1>
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Deconectat</span>
+            </div>
+        </header>
+
+        <!-- Controls -->
+        <div class="controls-bar">
+            <button id="startBtn" class="btn btn-primary">▶ Start Radar</button>
+            <button id="stopBtn" class="btn btn-secondary" disabled>■ Stop</button>
+            <button id="rebaselineBtn" class="btn btn-warning" disabled>🔄 Re-Baseline</button>
+            <label class="toggle-label">
+                <input type="checkbox" id="simulateToggle">
+                <span>Simulare</span>
+            </label>
+            <label class="toggle-label">
+                <input type="checkbox" id="debugToggle">
+                <span>Debug</span>
+            </label>
+        </div>
+
+        <!-- Main Game Area -->
+        <main class="game-main">
+            <!-- Score Panel -->
+            <div class="score-panel">
+                <div class="score-item">
+                    <span class="score-value" id="scoreValue">0</span>
+                    <span class="score-label">Scor</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-value" id="streakValue">0</span>
+                    <span class="score-label">Serie</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-value" id="timeValue">0:00</span>
+                    <span class="score-label">Timp</span>
+                </div>
+            </div>
+
+            <!-- Target Area -->
+            <div class="target-area" id="targetArea">
+                <div class="waiting-message" id="waitingMessage">
+                    <p>Apasă <strong>Start Radar</strong> pentru a începe!</p>
+                </div>
+                <div class="baseline-message" id="baselineMessage" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Se calibrează senzorul...</p>
+                </div>
+                <div class="target-display" id="targetDisplay" style="display: none;">
+                    <div class="target-instruction">Fă gestul:</div>
+                    <div class="target-icon" id="targetIcon">👆</div>
+                    <div class="target-name" id="targetName">Push</div>
+                    <div class="progress-ring" id="progressRing">
+                        <svg viewBox="0 0 120 120">
+                            <circle class="progress-bg" cx="60" cy="60" r="54" />
+                            <circle class="progress-fill" id="progressFill" cx="60" cy="60" r="54" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="success-flash" id="successFlash">✓</div>
+            </div>
+
+            <!-- Current Detection -->
+            <div class="detection-panel">
+                <div class="detection-item">
+                    <span class="detection-label">Detectat:</span>
+                    <span class="detection-icon" id="detectedIcon">✋</span>
+                    <span class="detection-name" id="detectedName">-</span>
+                </div>
+                <div class="detection-item">
+                    <span class="detection-label">Gate:</span>
+                    <span class="gate-badge" id="gateBadge">-</span>
+                </div>
+                <div class="detection-bar-container">
+                    <div class="detection-bar" id="pmaxBar"></div>
+                    <span class="detection-percent" id="pmaxText">0%</span>
+                </div>
+            </div>
+
+            <!-- Threshold Settings -->
+            <div class="settings-panel">
+                <div class="setting-item">
+                    <label>Min Confidence:</label>
+                    <input type="range" id="minPmaxSlider" min="0.2" max="0.8" step="0.05" value="0.45">
+                    <span id="minPmaxValue">45%</span>
+                </div>
+                <div class="setting-item">
+                    <label>Min Margin:</label>
+                    <input type="range" id="minMarginSlider" min="0.05" max="0.4" step="0.05" value="0.15">
+                    <span id="minMarginValue">15%</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Debug Panel -->
+        <div class="debug-panel" id="debugPanel" style="display: none;">
+            <span>gesture_out: <b id="dbgGesture">-</b></span>
+            <span>gate: <b id="dbgGate">-</b></span>
+            <span>pmax: <b id="dbgPmax">-</b></span>
+            <span>margin: <b id="dbgMargin">-</b></span>
+            <span>lvl: <b id="dbgLvl">-</b></span>
+            <span>mot: <b id="dbgMot">-</b></span>
+        </div>
+
+        <!-- Footer -->
+        <footer class="game-footer">
+            <p>Gesturi: Hold, Push, Pull, Tap, Wave • Țintește și menține ~0.35s</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="/static/game.js"></script>
+</body>
+
+</html>
