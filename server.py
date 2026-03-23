@@ -25,7 +25,7 @@ from typing import Optional, Dict, List
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
-PI_HOST = os.environ.get("PI_HOST", "172.24.35.184")
+PI_HOST = os.environ.get("PI_HOST", "192.168.252.105")
 PI_PORT = int(os.environ.get("PI_PORT", 6110))
 UPDATE_RATE = int(os.environ.get("UPDATE_RATE", 30))
 RANGE_START = float(os.environ.get("RANGE_START", 0.20))

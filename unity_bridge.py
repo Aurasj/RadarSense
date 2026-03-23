@@ -6,7 +6,16 @@ import time
 SERVER_URL = "http://localhost:5002"
 UNITY_IP = "127.0.0.1"
 UNITY_PORT = 5005
-COOLDOWN_TIME = 0.5  # Secunde de pauză între două comenzi trimise
+
+# Timpi de pauză personalizați (în secunde) pentru fiecare gest
+COOLDOWNS = {
+    'push': 0.4,  # Rapid, pentru a accelera/urca cursiv
+    'pull': 0.4,  # Rapid, pentru a frâna/coborî cursiv
+    'hold': 0.5,
+    'wave': 1.0,  # Gest tactic (meniu/schimbare tactică) - pauză mare
+    'tap':  1.0,  # Toggle Autopilot - pauză mare ca să nu facă dublu-click
+    'none': 0.1
+}
 
 # Pregătire Socket UDP pentru Unity
 unity_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -17,7 +26,7 @@ last_gesture_sent = "none"
 
 @sio.event
 def connect():
-    print("[BRIDGE] Conectat la serverul web radar!")
+    print("[BRIDGE] Conectat la serverul AI! Gata pentru SWARM CONTROL.")
 
 @sio.on('radar_data')
 def on_data(data):
@@ -26,25 +35,41 @@ def on_data(data):
     gesture = data.get('gesture_out', 'none')
     now = time.time()
 
-    # LOGICĂ: 
-    # 1. Să nu fie 'none' sau 'baseline'
-    # 2. Să fi trecut măcar 0.5 secunde de la ultima trimitere
-    # 3. SAU să fie un gest diferit de ultimul trimis
-    if gesture not in ['none', 'baseline']:
-        if (now - last_send_time > COOLDOWN_TIME) or (gesture != last_gesture_sent):
+    # 1. Ignorăm datele cât timp se calibrează
+    if gesture == 'baseline':
+        return
+
+    # 2. Logică inteligentă de trimitere
+    if gesture != 'none':
+        is_new_gesture = (gesture != last_gesture_sent)
+        cooldown_passed = (now - last_send_time) > COOLDOWNS.get(gesture, 0.5)
+
+        # Trimitem dacă e un gest nou SAU dacă am ținut mâna suficient timp (cooldown)
+        if is_new_gesture or cooldown_passed:
             unity_sock.sendto(gesture.encode(), (UNITY_IP, UNITY_PORT))
-            print(f"[BRIDGE] Gest trimis: {gesture}")
+            print(f"[{time.strftime('%H:%M:%S')}] 🚀 COMANDĂ TACTICĂ: {gesture.upper()}")
+            
             last_send_time = now
             last_gesture_sent = gesture
+            
+    else:
+        # Dacă luăm mâna de pe senzor ('none')
+        if last_gesture_sent != 'none':
+            unity_sock.sendto(b"none", (UNITY_IP, UNITY_PORT))
+            print(f"[{time.strftime('%H:%M:%S')}] 🛑 Mână retrasă (Idle)")
+            last_gesture_sent = 'none'
 
 @sio.on('status')
 def on_status(data):
     if not data.get('baseline_ready'):
-        print("[BRIDGE] Serverul se calibrează (Wait for baseline)...")
+        print("[BRIDGE] ⏳ Se calibrează senzorul (Nu mișca mâna)...")
 
 if __name__ == '__main__':
+    print("="*50)
+    print("  LINK DE DATE UDP (UNITY BRIDGE) - ACTIVAT")
+    print("="*50)
     try:
         sio.connect(SERVER_URL)
         sio.wait()
     except Exception as e:
-        print(f"[EROARE] Conexiune eșuată: {e}")
+        print(f"[EROARE] Conexiune eșuată: {e}. Asigură-te că server.py rulează!")

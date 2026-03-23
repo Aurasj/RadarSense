@@ -10,3 +10,7 @@ eventlet>=0.33.0
 
 # Acconeer SDK for A111
 acconeer-exptool>=6.0.0
+
+//pip install websocket-client
+//tre sa o pun 
+pip install "python-socketio[client]"
