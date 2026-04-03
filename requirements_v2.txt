@@ -1,0 +1,16 @@
+# Core Web Server & Dashboard
+Flask>=3.0.0
+Flask-SocketIO>=5.3.6
+Flask-Cors>=4.0.0
+eventlet>=0.33.3
+
+# Deep Learning & Processing
+torch>=2.0.0
+numpy>=1.24.0
+scipy>=1.11.0
+
+# Acconeer Hardware SDK
+acconeer-exptool>=7.3.0
+
+# Optional: For better terminal printing in monitors
+colorama>=0.4.6

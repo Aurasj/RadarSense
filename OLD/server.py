@@ -25,15 +25,15 @@ from typing import Optional, Dict, List
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
-PI_HOST = os.environ.get("PI_HOST", "192.168.252.105")
+PI_HOST = os.environ.get("PI_HOST", "192.168.0.145")
 PI_PORT = int(os.environ.get("PI_PORT", 6110))
 UPDATE_RATE = int(os.environ.get("UPDATE_RATE", 30))
 RANGE_START = float(os.environ.get("RANGE_START", 0.20))
 RANGE_END = float(os.environ.get("RANGE_END", 0.55))
 SERVER_PORT = int(os.environ.get("SERVER_PORT", 5002))
 
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "out_model", "gesture_cnn.onnx")
-META_PATH = os.path.join(os.path.dirname(__file__), "out_model", "gesture_cnn_meta.json")
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "V1", "gesture_cnn.onnx")
+META_PATH = os.path.join(os.path.dirname(__file__), "V1", "gesture_cnn_meta.json")
 
 # Gating parameters
 BASELINE_DURATION = 2.0  # seconds
@@ -576,8 +576,7 @@ class AcconeerExplorationClient:
             self.running = True
             
             # Start receive thread
-            self.thread = threading.Thread(target=self._receive_loop, daemon=True)
-            self.thread.start()
+            eventlet.spawn(self._receive_loop)
             
             return True
             
@@ -599,9 +598,6 @@ class AcconeerExplorationClient:
                 self.client.disconnect()
             except:
                 pass
-        
-        if self.thread:
-            self.thread.join(timeout=2)
         
         radar_connected = False
         self.client = None
@@ -658,15 +654,12 @@ class RadarSimulator:
         self.running = True
         radar_connected = True
         data_length = self.sim_data_length
-        self.thread = threading.Thread(target=self._loop, daemon=True)
-        self.thread.start()
+        eventlet.spawn(self._loop)
         print("[INFO] Simulator started")
     
     def stop(self):
         global radar_connected
         self.running = False
-        if self.thread:
-            self.thread.join(timeout=1)
         radar_connected = False
     
     def _gen_frame(self, t: int, pattern: str) -> np.ndarray:
@@ -875,13 +868,22 @@ def on_rebaseline():
 # MAIN
 # =============================================================================
 if __name__ == '__main__':
+    import webbrowser, threading as _bt
+    url = f'http://localhost:{SERVER_PORT}'
     print("=" * 60)
     print(" GESTURE RADAR - Production Pipeline")
     print("=" * 60)
     print(f" Pi Server: {PI_HOST}:{PI_PORT}")
     print(f" Range: [{RANGE_START}, {RANGE_END}] m @ {UPDATE_RATE} Hz")
     print(f" Model: {T}x{R}, labels={LABELS}")
-    print(f" Server: http://localhost:{SERVER_PORT}")
+    print(f" Dashboard → {url}")
     print("=" * 60)
-    
-    socketio.run(app, host='0.0.0.0', port=SERVER_PORT, debug=False)
+    _bt.Timer(1.2, lambda: webbrowser.open(url)).start()
+    import sys
+    try:
+        socketio.run(app, host='0.0.0.0', port=SERVER_PORT, debug=False)
+    except KeyboardInterrupt:
+        print("\n[INFO] Server shutting down (Ctrl+C).")
+        on_stop() # ensure background sockets are released
+        sys.exit(0)
+
