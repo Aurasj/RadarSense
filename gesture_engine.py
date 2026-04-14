@@ -42,19 +42,21 @@ _META_PATH  = os.path.join(_HERE, "out_model", "gesture_cnn_meta.json")
 # ─────────────────────────────────────────────────────────────
 NOISE_GATE   = 0.15          # min-max range threshold
 
-EMA_ALPHA    = 0.6           # higher → more reactive to impulse gestures
-
+EMA_ALPHA    = 0.6          # Extrem de reactiv pentru comenzi instante pe mașină (anterior 0.6)
+#EMA_ALPHA   = 0.35
+          # Smoother, dar cu delay mai mare (anterior 0.3) — păstrat în meta pentru test_model.py
 MIN_CONF = {
     "push":    0.40,
     "pull":    0.40,
     "tap":     0.70,
     "wave":    0.40,
-    "hold":    0.60,
+    "hold":    0.60,         # Ultra-mic pt plecare instantă de pe loc (anterior 0.6)
     "default": 0.50,
 }
 
 DEBOUNCE = {
     "hold":    5,
+   # "hold":    1,                       # Declanșare pe loc (anterior 3->5)
     "tap":     3,
     "wave":    2,
     "push":    1,
@@ -64,7 +66,9 @@ DEBOUNCE = {
 
 COOLDOWN_MAX = 15            # frames after tap / wave
 COOLDOWN_BURST = 4           # frames after push / pull  (burst mode)
-WARMUP_MAX   = 10            # frames to ignore on hand entry (except hold)
+WARMUP_MAX   = 10
+#WARMUP_MAX   = 10
+  # Eliminăm aproape complet delay-ul la băgat mâna (anterior 5->10)
 
 # Fast-track threshold for push / pull  (overrides EMA inertia)
 FAST_TRACK_THRESH = 0.65
@@ -237,7 +241,10 @@ class GestureEngine:
             self._ema_probs[:] = 1.0 / len(self.labels)
             self._fsm_label    = "none"
             self._fsm_count    = 0
+            
+            was_open = self._gate_was_open
             self._gate_was_open = False
+            
             if self._cooldown > 0:
                 self._cooldown -= 1
             # Decay display
@@ -248,6 +255,11 @@ class GestureEngine:
                 self._display_confidence = 0.0
 
             probs = self._probs_dict()
+            
+            # Trimitem INSTANT un eveniment "none" (is_event=True) pentru a frâna hardware-ul
+            if was_open:
+                return "none", 1.0, probs, True
+                
             return self._display_gesture, self._display_confidence, probs, False
 
         # Warmup on hand entry

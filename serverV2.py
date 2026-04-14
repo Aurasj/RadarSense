@@ -295,8 +295,11 @@ def _radar_loop() -> None:
         # ── 6. UDP bridge to Unity + Monitor ──────────────────────────────────
         # is_event is True on EXACTLY ONE frame per gesture.
         # This guarantees Unity receives a single clean pulse.
-        if is_event and gesture != "none":
-            print(f"[Server] ⚡ GESTURE → Unity: {gesture}  (conf={confidence:.3f})")
+        if is_event:
+            if gesture != "none":
+                print(f"[Server] ⚡ GESTURE → Unity: {gesture}  (conf={confidence:.3f})")
+            else:
+                print(f"[Server] 🛑 RADAR GOL → Oprim totul (Frână instanță!)")
             _udp_send(gesture)
 
         # Yield to avoid 100% CPU; the SDK's blocking get_next() paces the loop
