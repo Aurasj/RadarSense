@@ -47,16 +47,16 @@ EMA_ALPHA    = 0.6           # higher → more reactive to impulse gestures
 MIN_CONF = {
     "push":    0.40,
     "pull":    0.40,
-    "tap":     0.70,
-    "wave":    0.40,
-    "hold":    0.60,
+    "tap":     0.80,
+    "wave":    0.10,
+    "hold":    0.70,
     "default": 0.50,
 }
 
 DEBOUNCE = {
     "hold":    5,
     "tap":     3,
-    "wave":    2,
+    "wave":    1,
     "push":    1,
     "pull":    1,
     "default": 2,
@@ -68,6 +68,7 @@ WARMUP_MAX   = 10            # frames to ignore on hand entry (except hold)
 
 # Fast-track threshold for push / pull  (overrides EMA inertia)
 FAST_TRACK_THRESH = 0.65
+WAVE_FAST_TRACK_THRESH = 0.35
 
 
 # ══════════════════════════════════════════════════════════════
@@ -277,9 +278,15 @@ class GestureEngine:
         if raw_top_label in ("push", "pull") and raw_top_prob > FAST_TRACK_THRESH:
             top_label = raw_top_label
             top_prob  = raw_top_prob
-            # Reset EMA so EMA inertia doesn't pull back towards hold
             self._ema_probs[:] = 1.0 / len(self.labels)
             self._ema_probs[raw_top_idx] = raw_top_prob
+
+        elif raw_top_label == "wave" and raw_top_prob > WAVE_FAST_TRACK_THRESH:
+            top_label = "wave"
+            top_prob  = raw_top_prob
+            self._ema_probs[:] = 1.0 / len(self.labels)
+            self._ema_probs[raw_top_idx] = raw_top_prob
+
         else:
             top_idx   = int(np.argmax(self._ema_probs))
             top_prob  = float(self._ema_probs[top_idx])

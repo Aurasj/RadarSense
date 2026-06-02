@@ -51,7 +51,7 @@ log = logging.getLogger("server")
 # CONFIGURATION  (override via environment variables)
 # ══════════════════════════════════════════════════════════════════════════════
 
-PI_HOST     = os.environ.get("PI_HOST",     "192.168.0.145")
+PI_HOST     = os.environ.get("PI_HOST",     "10.165.186.184")
 PI_PORT     = int(os.environ.get("PI_PORT",       6110))
 SERVER_PORT = int(os.environ.get("SERVER_PORT",   5002))
 RANGE_START = float(os.environ.get("RANGE_START",  0.20))   # metres
