@@ -42,21 +42,21 @@ _META_PATH  = os.path.join(_HERE, "out_model", "gesture_cnn_meta.json")
 # ─────────────────────────────────────────────────────────────
 NOISE_GATE   = 0.15          # min-max range threshold
 
-EMA_ALPHA    = 0.6           # higher → more reactive to impulse gestures
+EMA_ALPHA    = 0.70          # production: reactive but still stable
 
 MIN_CONF = {
     "push":    0.40,
     "pull":    0.40,
-    "tap":     0.80,
-    "wave":    0.10,
-    "hold":    0.70,
+    "tap":     0.45,
+    "wave":    0.55,   # stricter so it does not steal tap/hold
+    "hold":    0.45,   # hand hold is less reflective than a phone/object
     "default": 0.50,
 }
 
 DEBOUNCE = {
     "hold":    5,
-    "tap":     3,
-    "wave":    1,
+    "tap":     2,
+    "wave":    2,
     "push":    1,
     "pull":    1,
     "default": 2,
@@ -68,7 +68,8 @@ WARMUP_MAX   = 10            # frames to ignore on hand entry (except hold)
 
 # Fast-track threshold for push / pull  (overrides EMA inertia)
 FAST_TRACK_THRESH = 0.65
-WAVE_FAST_TRACK_THRESH = 0.35
+WAVE_FAST_TRACK_THRESH = 0.70
+TAP_FAST_TRACK_THRESH  = 0.58
 
 
 # ══════════════════════════════════════════════════════════════
@@ -213,6 +214,7 @@ class GestureEngine:
             "gate_open": self._gate_was_open,
             "raw_top":   self.labels[top_idx],
             "raw_conf":  float(self._ema_probs[top_idx]),
+            "display":   self._display_gesture,
         }
 
     def predict(
@@ -277,6 +279,12 @@ class GestureEngine:
 
         if raw_top_label in ("push", "pull") and raw_top_prob > FAST_TRACK_THRESH:
             top_label = raw_top_label
+            top_prob  = raw_top_prob
+            self._ema_probs[:] = 1.0 / len(self.labels)
+            self._ema_probs[raw_top_idx] = raw_top_prob
+
+        elif raw_top_label == "tap" and raw_top_prob > TAP_FAST_TRACK_THRESH:
+            top_label = "tap"
             top_prob  = raw_top_prob
             self._ema_probs[:] = 1.0 / len(self.labels)
             self._ema_probs[raw_top_idx] = raw_top_prob

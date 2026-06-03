@@ -1,0 +1,19 @@
+Radar Gesture Classification Report
+===================================
+
+Best epoch: 14
+Best validation accuracy: 0.995652
+Accuracy score: 0.995652
+
+              precision    recall  f1-score   support
+
+        none     1.0000    1.0000    1.0000        80
+        hold     1.0000    0.9667    0.9831        30
+        push     1.0000    1.0000    1.0000        30
+        pull     1.0000    1.0000    1.0000        30
+         tap     1.0000    1.0000    1.0000        30
+        wave     0.9677    1.0000    0.9836        30
+
+    accuracy                         0.9957       230
+   macro avg     0.9946    0.9944    0.9944       230
+weighted avg     0.9958    0.9957    0.9957       230

@@ -1,0 +1,24 @@
+{
+  "session": "20260603_164443",
+  "out_dir": "data",
+  "plan": [
+    [
+      "pull",
+      0
+    ]
+  ],
+  "remaining": {
+    "pull": 0
+  },
+  "cur_label_idx": 0,
+  "sample_idx": {
+    "pull": 30
+  },
+  "config": {
+    "seconds": 2.0,
+    "update_rate": 30.0,
+    "range_start": 0.2,
+    "range_end": 0.55
+  },
+  "updated_unix_ms": 1780494579368
+}

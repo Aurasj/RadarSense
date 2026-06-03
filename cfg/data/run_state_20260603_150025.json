@@ -1,0 +1,54 @@
+{
+  "session": "20260603_150025",
+  "out_dir": "data",
+  "plan": [
+    [
+      "hold",
+      15
+    ],
+    [
+      "push",
+      15
+    ],
+    [
+      "pull",
+      15
+    ],
+    [
+      "tap",
+      15
+    ],
+    [
+      "wave",
+      15
+    ],
+    [
+      "none",
+      50
+    ]
+  ],
+  "remaining": {
+    "hold": 0,
+    "push": 15,
+    "pull": 15,
+    "tap": 15,
+    "wave": 15,
+    "none": 50
+  },
+  "cur_label_idx": 1,
+  "sample_idx": {
+    "hold": 15,
+    "push": 0,
+    "pull": 0,
+    "tap": 0,
+    "wave": 0,
+    "none": 0
+  },
+  "config": {
+    "seconds": 2.0,
+    "update_rate": 30.0,
+    "range_start": 0.2,
+    "range_end": 0.55
+  },
+  "updated_unix_ms": 1780488114248
+}

@@ -194,9 +194,15 @@ function init() {
       heatmap.append(normalized);
     });
 
-    socket.on("prediction", ({ gesture, probabilities, raw_probabilities, fps, debug }) => {
-      if (elements.statFps) elements.statFps.textContent = Number(fps || 0).toFixed(1);
-      updateGestureDisplay(gesture, probabilities, debug || {}, raw_probabilities || probabilities);
+    socket.on("prediction", (payload) => {
+      const gesture = payload.gesture || "none";
+      const probabilities = payload.probabilities || {};
+      const debug = payload.debug || payload.fsm || {};
+      const rawProbabilities = payload.raw_probabilities || probabilities;
+      const fps = payload.fps || 0;
+
+      if (elements.statFps) elements.statFps.textContent = Number(fps).toFixed(1);
+      updateGestureDisplay(gesture, probabilities, debug, rawProbabilities);
       updateConfidenceBars(probabilities);
     });
 
@@ -216,7 +222,7 @@ function init() {
     if ($("btnRebaseline")) {
       $("btnRebaseline").addEventListener("click", () => {
         logEntry("Re-baselining...", "warn");
-        socket.emit("rebaseline");
+        socket.emit("rebase");
       });
     }
     if ($("btnClearLog")) {
@@ -278,24 +284,18 @@ function getTopPrediction(probabilities) {
 }
 
 function updateGestureDisplay(gesture, probabilities, debug = {}, rawProbabilities = probabilities) {
-  const displayTop = getTopPrediction(probabilities);
-  const rawTop = getTopPrediction(rawProbabilities);
-  const rawTopLabel = debug.raw_top || rawTop.topLabel;
-  const rawTopConf = Number(debug.raw_conf ?? rawProbabilities?.[rawTopLabel] ?? rawTop.topConf ?? 0);
-  const gateTag = debug.gate ? ` | gate=${debug.gate}` : "";
+  // UI final: afișăm doar gestul stabilizat de server/FSM.
+  // Raw CNN rămâne doar pentru confidence bars/debug, nu în textul principal.
 
-  // Keep UI strictly synchronized with final server gesture.
   if (gesture !== "none") {
     elements.gestureEmoji.textContent = GESTURE_EMOJIS[gesture] || "❓";
     elements.gestureLabel.textContent = gesture.toUpperCase();
     elements.gestureCard.style.setProperty("--gesture-glow", GESTURE_GLOWS[gesture]);
     elements.gestureStatusPill.className = "pill pill--active";
     elements.gestureStatusPill.textContent = "ACTIVE";
-    const outConf = Number(probabilities?.[gesture] ?? displayTop.topConf ?? 0);
-    const rawTag = rawTopLabel !== gesture
-      ? ` | raw=${rawTopLabel.toUpperCase()} ${Math.round(rawTopConf * 100)}%`
-      : "";
-    elements.gestureConfidence.textContent = `${Math.round(outConf * 100)}%${gateTag}${rawTag}`;
+
+    const outConf = Number(probabilities?.[gesture] ?? 0);
+    elements.gestureConfidence.textContent = `${Math.round(outConf * 100)}% confidence`;
 
     if (gesture !== lastGesture) {
       logEntry(`Gesture: ${gesture.toUpperCase()} detected`, "gest");
@@ -305,11 +305,7 @@ function updateGestureDisplay(gesture, probabilities, debug = {}, rawProbabiliti
     }
   } else {
     resetGestureToNone();
-    const noneConf = Number(probabilities?.none ?? displayTop.topConf ?? 1);
-    const rawTag = rawTopLabel !== "none"
-      ? ` | raw=${rawTopLabel.toUpperCase()} ${Math.round(rawTopConf * 100)}%`
-      : "";
-    elements.gestureConfidence.textContent = `NONE ${Math.round(noneConf * 100)}%${gateTag}${rawTag}`;
+    elements.gestureConfidence.textContent = "No confirmed gesture";
   }
 }
 

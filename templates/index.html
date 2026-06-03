@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AntRadar — Gesture Intelligence Platform</title>
-  <meta name="description" content="Real-time radar gesture recognition dashboard powered by CNN+GRU deep learning inference on Acconeer A111." />
+  <meta name="description" content="Real-time radar gesture recognition dashboard powered by CNN inference and temporal FSM filtering on Acconeer A111." />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -41,7 +41,7 @@
     </div>
 
     <nav class="topbar__center" aria-label="Primary navigation">
-      <span class="nav-tag">CNN + GRU</span>
+      <span class="nav-tag">CNN + FSM</span>
       <span class="nav-tag">A111 @ 30 Hz</span>
       <span class="nav-tag" id="fpsTag">0 FPS</span>
     </nav>
@@ -161,7 +161,7 @@
             </span>
             Confidence Distribution
           </h2>
-          <span class="pill pill--dim">EMA α=0.4</span>
+          <span class="pill pill--dim">EMA + FSM</span>
         </div>
 
         <div class="confidence-bars" id="confidenceBars" role="group" aria-label="Class confidence levels">
@@ -211,9 +211,9 @@
 
   <!-- ───────────────────────────── FOOTER ────────────────────────────── -->
   <footer class="footer" role="contentinfo">
-    <span>Acconeer A111 &nbsp;·&nbsp; 20–55 cm &nbsp;·&nbsp; CNN+GRU V2</span>
+    <span>Acconeer A111 &nbsp;·&nbsp; 20–55 cm &nbsp;·&nbsp; CNN + FSM V3</span>
     <span id="footerMode">Offline</span>
-    <span>AntRadar © 2025</span>
+    <span>AntRadar © 2026</span>
   </footer>
 
   <!-- Main JS -->

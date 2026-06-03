@@ -9,13 +9,28 @@
   ],
   "T": 60,
   "R": 128,
-  "mean": 4.732889175415039,
-  "std": 0.5092196331748963,
-  "preprocess": "fix_T + resample_range_to_R + log1p + (x-mean)/std",
+  "mean": 4.8500895500183105,
+  "std": 0.7037895917892456,
+  "preprocess": "fix_T + resample_range_to_R + log1p + z_score",
   "input_shape": [
     1,
     1,
     60,
     128
-  ]
+  ],
+  "model_name": "TinyCNN",
+  "version": "v3",
+  "best_epoch": 14,
+  "best_val_acc": 0.9956521739130435,
+  "class_counts": {
+    "none": 400,
+    "hold": 150,
+    "push": 150,
+    "pull": 150,
+    "tap": 150,
+    "wave": 150
+  },
+  "train_size": 920,
+  "val_size": 230,
+  "seed": 42
 }

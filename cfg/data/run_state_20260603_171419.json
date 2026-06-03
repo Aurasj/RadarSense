@@ -1,0 +1,24 @@
+{
+  "session": "20260603_171419",
+  "out_dir": "data",
+  "plan": [
+    [
+      "tap",
+      0
+    ]
+  ],
+  "remaining": {
+    "tap": 0
+  },
+  "cur_label_idx": 0,
+  "sample_idx": {
+    "tap": 51
+  },
+  "config": {
+    "seconds": 1.0,
+    "update_rate": 30.0,
+    "range_start": 0.2,
+    "range_end": 0.55
+  },
+  "updated_unix_ms": 1780496148070
+}

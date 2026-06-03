@@ -1,0 +1,24 @@
+{
+  "session": "20260603_164022",
+  "out_dir": "data",
+  "plan": [
+    [
+      "wave",
+      15
+    ]
+  ],
+  "remaining": {
+    "wave": 7
+  },
+  "cur_label_idx": 0,
+  "sample_idx": {
+    "wave": 8
+  },
+  "config": {
+    "seconds": 2.0,
+    "update_rate": 30.0,
+    "range_start": 0.2,
+    "range_end": 0.55
+  },
+  "updated_unix_ms": 1780494044755
+}
