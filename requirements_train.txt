@@ -1,0 +1,7 @@
+# Training/evaluation dependencies
+-r requirements.txt
+
+scikit-learn>=1.4.0
+matplotlib>=3.8.0
+onnx>=1.16.0
+onnxscript>=0.1.0

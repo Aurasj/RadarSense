@@ -1,8 +1,0 @@
-# dependencies for server.py (legacy game logic included)
-Flask==3.0.0
-Flask-SocketIO==5.3.6
-Flask-Cors==4.0.0
-eventlet==0.33.3
-numpy==1.26.2
-scipy==1.11.4
-acconeer-exptool==7.3.0

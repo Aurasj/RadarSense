@@ -1,21 +1,10 @@
-# Core Web Server & Dashboard
+# Runtime dependencies for AntRadar dashboard/server
 Flask>=3.0.0
 Flask-SocketIO>=5.3.6
 Flask-Cors>=4.0.0
 
-# Deep Learning & Processing
 torch>=2.0.0
 numpy>=1.24.0
-scipy>=1.11.0
 
-# Acconeer Hardware SDK
+# Exact version verified with SparkFun A111 server setup
 acconeer-exptool==7.12.2
-
-# Optional: For better terminal printing in monitors
-colorama>=0.4.6
-
-# Training/evaluation utilities
-scikit-learn>=1.4.0
-matplotlib>=3.8.0
-onnx>=1.16.0
-onnxscript>=0.1.0
