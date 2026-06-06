@@ -93,17 +93,17 @@ def parse_plan(plan: str) -> List[Tuple[str, int]]:
         elif ":" in part:
             k, v = part.split(":", 1)
         else:
-            raise ValueError(f"Plan invalid: {part!r} (folosește label=COUNT)")
+            raise ValueError(f"Invalid plan: {part!r} (use label=COUNT)")
         k = k.strip()
         v = v.strip()
         if k not in LABELS:
-            raise ValueError(f"Label necunoscut în plan: {k!r} (permise: {LABELS})")
+            raise ValueError(f"Unknown label in plan: {k!r} (allowed: {LABELS})")
         n = int(v)
         if n <= 0:
-            raise ValueError(f"COUNT trebuie >0 pentru {k!r}")
+            raise ValueError(f"COUNT must be >0 for {k!r}")
         out.append((k, n))
     if not out:
-        raise ValueError("Plan gol")
+        raise ValueError("Empty plan")
     return out
 
 
@@ -126,7 +126,7 @@ class RadarReader(threading.Thread):
     def run(self) -> None:
         try:
             while not self.stop_evt.is_set():
-                _info, data = self.client.get_next()  # blocking; de-aia e în thread
+                _info, data = self.client.get_next()  # blocking, so run in thread
                 frame = np.asarray(data).squeeze().astype(np.float32)
                 if frame.ndim != 1:
                     frame = frame.reshape(-1).astype(np.float32)
@@ -342,7 +342,7 @@ def main() -> int:
         cfg_r_start = float(resume_state["config"]["range_start"])
         cfg_r_end = float(resume_state["config"]["range_end"])
 
-        # override runtime config with stored (sa nu amesteci dataset-uri)
+        # override runtime config with stored (to avoid mixing datasets)
         args.seconds = cfg_seconds
         args.update_rate = cfg_update_rate
         args.range_start = cfg_r_start
@@ -665,7 +665,7 @@ def main() -> int:
                     else:
                         # auto/plan
                         if record_requested and (not arming) and (not recording):
-                            # force one sample now (chiar dacă e pauză)
+                            # force one sample now (even if paused)
                             record_requested = False
                             start_arm()
                         elif (not paused) and (not arming) and (not recording) and (remaining[cur_label()] > 0):
@@ -706,9 +706,9 @@ def main() -> int:
                         dist_line = f"PEAK: {peak_m:0.3f} m   COM: {com_m:0.3f} m   peak={peak_val:0.1f}   thr≈{present_thr:0.1f}   fps≈{fps_est:0.1f}"
 
                         if warn_edge:
-                            edge_msg = "WARN: prea aproape de margine (mută mâna mai spre interior)"
+                            edge_msg = "WARN: too close to the edge (move your hand closer to the center)"
                         else:
-                            edge_msg = "OK: în interiorul ferestrei (nu ești lipit de margini)"
+                            edge_msg = "OK: inside the window (not near the edges)"
 
                         mode_msg = "MANUAL" if manual_mode else ("AUTO (plan)" if len(plan) > 1 else "AUTO")
                         lab = cur_label()
@@ -739,15 +739,15 @@ def main() -> int:
                         if show_help:
                             lines.append(("", 0))
                             lines.append(("HELP:", cp_title))
-                            lines.append(("- Scop: PEAK (m) să fie clar în interior și să nu apară WARN.", 0))
-                            lines.append(("- Apasă r → așteaptă start_delay → apoi fă gestul în cele 2 sec.", 0))
-                            lines.append(("- p pune pauză (oprește auto). q iese și salvează state pentru resume.", 0))
+                            lines.append(("- Goal: keep PEAK (m) inside the window to avoid WARN.", 0))
+                            lines.append(("- Press r -> wait for start_delay -> perform gesture in the 2s window.", 0))
+                            lines.append(("- p pauses (stops auto). q exits and saves state for resuming.", 0))
                             lines.append((f"- Resume: python ... --resume {state_path}", 0))
 
                         # reader health
                         dt_rx = now - reader.last_rx_time
                         if dt_rx > 1.0:
-                            lines.append((f"WARNING: nu am primit frame-uri de {dt_rx:0.1f}s (server blocat?)", cp_bad))
+                            lines.append((f"WARNING: no frames received for {dt_rx:0.1f}s (server frozen?)", cp_bad))
                         if reader.error:
                             lines.append((f"READER ERROR: {reader.error}", cp_bad))
 

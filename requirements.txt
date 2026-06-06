@@ -1,4 +1,4 @@
-# Runtime dependencies for AntRadar dashboard/server
+# Runtime dependencies for RadarSense dashboard/server
 Flask>=3.0.0
 Flask-SocketIO>=5.3.6
 Flask-Cors>=4.0.0

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AntRadar — Gesture Intelligence Platform</title>
+  <title>RadarSense — Gesture Intelligence Platform</title>
   <meta name="description" content="Real-time radar gesture recognition dashboard powered by CNN inference and temporal FSM filtering on Acconeer A111." />
 
   <!-- Google Fonts -->
@@ -32,15 +32,18 @@
           </svg>
         </div>
         <div class="brand__text">
-          <span class="brand__name">AntRadar</span>
-          <span class="brand__sub">Gesture Intelligence Platform</span>
+          <span class="brand__name">RadarSense</span>
+          <span class="brand__sub">Real-Time Radar Gesture Recognition</span>
         </div>
       </div>
     </div>
 
     <nav class="topbar__center" aria-label="Primary navigation">
-      <span class="nav-tag">CNN + FSM</span>
-      <span class="nav-tag">A111 @ 30 Hz</span>
+      <div class="view-switcher" role="tablist">
+        <button class="view-tab view-tab--active" id="tabLive" role="tab" aria-selected="true">Live View</button>
+        <button class="view-tab" id="tabReport" role="tab" aria-selected="false">Model Report</button>
+      </div>
+      <div class="ctrl-divider" style="margin: 0 4px;" aria-hidden="true"></div>
       <span class="nav-tag" id="fpsTag">0 FPS</span>
     </nav>
 
@@ -55,13 +58,13 @@
       <div class="ctrl-group">
         <button class="btn btn--primary" id="btnStartLive" title="Connect to live radar hardware">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Live
+          Connect
         </button>
 
         <div class="ctrl-divider" aria-hidden="true"></div>
         <button class="btn btn--warn" id="btnRebaseline" title="Reset EMA probabilities and re-calibrate">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7a5 5 0 1 0 1.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M2 2v3h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Re-baseline
+          Recalibrate
         </button>
         <button class="btn btn--danger" id="btnDisconnect" title="Stop radar and disconnect">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="3" y1="3" x2="11" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="11" y1="3" x2="3" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -72,7 +75,7 @@
   </header>
 
   <!-- ──────────────────────────── MAIN LAYOUT ──────────────────────────── -->
-  <main class="dashboard" role="main">
+  <main class="dashboard" id="liveView" role="main">
 
     <!-- ═══ LEFT COLUMN ════════════════════════════════════════════════════ -->
     <div class="col col--left">
@@ -187,6 +190,80 @@
         </div>
       </div>
 
+      <!-- Session Statistics -->
+      <section class="card" aria-labelledby="sessTitle">
+        <div class="card__header">
+          <h2 class="card__title" id="sessTitle">
+            <span class="card__icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 14V8m3 6V5m3 9V3m3 11V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </span>
+            Session Statistics
+          </h2>
+          <span class="pill pill--dim" id="sessTotal">0 events</span>
+        </div>
+        <div class="sess-grid" id="sessGrid">
+          <div class="sess-item" data-gesture="hold">
+            <span class="sess-item__emoji">🤚</span>
+            <span class="sess-item__count" id="sessCount-hold">0</span>
+            <span class="sess-item__label">Hold</span>
+          </div>
+          <div class="sess-item" data-gesture="push">
+            <span class="sess-item__emoji">👆</span>
+            <span class="sess-item__count" id="sessCount-push">0</span>
+            <span class="sess-item__label">Push</span>
+          </div>
+          <div class="sess-item" data-gesture="pull">
+            <span class="sess-item__emoji">👇</span>
+            <span class="sess-item__count" id="sessCount-pull">0</span>
+            <span class="sess-item__label">Pull</span>
+          </div>
+          <div class="sess-item" data-gesture="tap">
+            <span class="sess-item__emoji">👉</span>
+            <span class="sess-item__count" id="sessCount-tap">0</span>
+            <span class="sess-item__label">Tap</span>
+          </div>
+          <div class="sess-item" data-gesture="wave">
+            <span class="sess-item__emoji">👋</span>
+            <span class="sess-item__count" id="sessCount-wave">0</span>
+            <span class="sess-item__label">Wave</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- System Health -->
+      <section class="card" aria-labelledby="healthTitle">
+        <div class="card__header">
+          <h2 class="card__title" id="healthTitle">
+            <span class="card__icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.8 3.6L14 6.3l-3 2.9.7 4.1L8 11.3l-3.7 1.9.7-4.1-3-2.9 4.2-.7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            </span>
+            System Health
+          </h2>
+        </div>
+        <div class="health-grid">
+          <div class="health-item">
+            <span class="health-dot" id="healthDotRadar"></span>
+            <span class="health-label">Radar</span>
+            <span class="health-val" id="healthValRadar">Offline</span>
+          </div>
+          <div class="health-item">
+            <span class="health-dot health-dot--ok"></span>
+            <span class="health-label">Model</span>
+            <span class="health-val">Ready</span>
+          </div>
+          <div class="health-item">
+            <span class="health-dot" id="healthDotSocket"></span>
+            <span class="health-label">Socket</span>
+            <span class="health-val" id="healthValSocket">Disconnected</span>
+          </div>
+          <div class="health-item">
+            <span class="health-dot health-dot--ok"></span>
+            <span class="health-label">UDP</span>
+            <span class="health-val">Enabled</span>
+          </div>
+        </div>
+      </section>
+
       <!-- Terminal log card -->
       <section class="card card--terminal" aria-labelledby="logTitle">
         <div class="card__header">
@@ -207,14 +284,125 @@
 
   </main>
 
+  <!-- ──────────────────────────── MODEL REPORT ──────────────────────────── -->
+  <main class="report-view" id="reportView" style="display: none;" role="main">
+    <div class="report-header">
+      <h1 class="report-title">Model Evaluation Report</h1>
+      <p class="report-subtitle">The model report is generated from the validation split used during training.</p>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="report-stats">
+      <div class="stat-card">
+        <div class="stat-card__value">99.56%</div>
+        <div class="stat-card__label">Validation Accuracy</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__value">14</div>
+        <div class="stat-card__label">Best Epoch</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__value">920 / 230</div>
+        <div class="stat-card__label">Train / Val Split</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__value">6</div>
+        <div class="stat-card__label">Classes</div>
+      </div>
+    </div>
+
+    <div class="report-grid">
+      <!-- Left col: Details & Table -->
+      <div class="col">
+        <section class="card">
+          <div class="card__header">
+            <h2 class="card__title">Model Architecture</h2>
+          </div>
+          <div class="report-details">
+            <div class="detail-row"><span>Model</span><strong>TinyCNN</strong></div>
+            <div class="detail-row"><span>Input</span><strong>60 frames × 128 bins</strong></div>
+            <div class="detail-row"><span>Classes</span><strong>none, hold, push, pull, tap, wave</strong></div>
+            <div class="detail-row"><span>Preprocessing</span><strong>log1p + z-score normalization</strong></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card__header">
+            <h2 class="card__title">Classification Report</h2>
+          </div>
+          <div class="table-wrap">
+            <table class="report-table">
+              <thead>
+                <tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>Support</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>none</td><td>1.0000</td><td>1.0000</td><td>1.0000</td><td>80</td></tr>
+                <tr><td>hold</td><td>1.0000</td><td>0.9667</td><td>0.9831</td><td>30</td></tr>
+                <tr><td>push</td><td>1.0000</td><td>1.0000</td><td>1.0000</td><td>30</td></tr>
+                <tr><td>pull</td><td>1.0000</td><td>1.0000</td><td>1.0000</td><td>30</td></tr>
+                <tr><td>tap</td><td>1.0000</td><td>1.0000</td><td>1.0000</td><td>30</td></tr>
+                <tr><td>wave</td><td>0.9677</td><td>1.0000</td><td>0.9836</td><td>30</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right col: Charts -->
+      <div class="col">
+        <section class="card">
+          <div class="card__header">
+            <h2 class="card__title">Confusion Matrix</h2>
+          </div>
+          <div class="chart-img">
+            <img src="/static/reports/confusion_matrix.png" alt="Confusion Matrix" />
+          </div>
+        </section>
+        
+        <div class="charts-row">
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Accuracy Curve</h2>
+            </div>
+            <div class="chart-img">
+              <img src="/static/reports/accuracy_curve.png" alt="Accuracy Curve" />
+            </div>
+          </section>
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Loss Curve</h2>
+            </div>
+            <div class="chart-img">
+              <img src="/static/reports/loss_curve.png" alt="Loss Curve" />
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
   <!-- ───────────────────────────── FOOTER ────────────────────────────── -->
-  <footer class="footer" role="contentinfo">
-    <span>Acconeer A111 &nbsp;·&nbsp; 20–55 cm &nbsp;·&nbsp; CNN + FSM V3</span>
-    <span id="footerMode">Offline</span>
-    <span>AntRadar © 2026</span>
-  </footer>
+  <footer class="footer">
+  <div class="footer__left">
+    Acconeer A111 <span>•</span> Range 0.20–0.55 m <span>•</span> 30 Hz
+  </div>
+
+  <div class="footer__center">
+  Inference: TinyCNN + FSM <span>•</span> <span id="footerMode">Offline</span>
+  </div>
+
+  <div class="footer__right">
+    RadarSense v1.0.0 <span>•</span> © 2026
+  </div>
+</footer>
+
+  <!-- Image Modal -->
+  <div class="image-modal" id="imageModal" aria-hidden="true">
+    <div class="image-modal__backdrop" id="modalBackdrop"></div>
+    <img src="" alt="Enlarged View" class="image-modal__content" id="modalImage" />
+  </div>
 
   <!-- Main JS -->
-  <script src="/static/js/main.js?v=4" defer></script>
+  <script src="/static/js/main.js?v=7" defer></script>
 </body>
 </html>

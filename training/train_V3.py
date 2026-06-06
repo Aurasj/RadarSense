@@ -2,22 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-train_v3.py — Radar Gesture CNN Training Pipeline
+Training script for the RadarSense gesture classifier.
 
-V3 improvements:
-- clean output folder: out_model/
-- fixed random seed for reproducibility
-- stratified train/validation split
-- preprocessing identical with live engine:
-    fix_T + resample_range + log1p + z-score
-- train-only augmentation
-- class weighting for imbalanced dataset
-- best model saving
-- ONNX export
-- classification report
-- confusion matrix PNG
-- training history JSON
-- metadata JSON for live inference
+Loads the recorded dataset, trains the TinyCNN model and
+generates the files used for evaluation and live inference.
 """
 
 import os
@@ -251,7 +239,7 @@ def collect_dataset():
         folder_path = os.path.join(DATA_DIR, class_name)
 
         if not os.path.isdir(folder_path):
-            print(f"⚠️ Folder lipsă: {folder_path}")
+            print(f"⚠️ Missing folder: {folder_path}")
             continue
 
         files = sorted(glob.glob(os.path.join(folder_path, "*.npz")))
@@ -262,11 +250,11 @@ def collect_dataset():
             class_counts[class_name] += 1
 
     if len(file_paths) == 0:
-        raise RuntimeError(f"Nu am găsit niciun .npz în {DATA_DIR}/")
+        raise RuntimeError(f"No .npz files found in {DATA_DIR}/")
 
     missing = [c for c in CLASSES if class_counts[c] == 0]
     if missing:
-        raise RuntimeError(f"Clase fără sample-uri: {missing}")
+        raise RuntimeError(f"Classes without samples: {missing}")
 
     return file_paths, labels, class_counts
 

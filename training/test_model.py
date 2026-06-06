@@ -138,7 +138,7 @@ def main():
     client.connect()
     client.setup_session(cfg)
     client.start_session()
-    print("Connected. Fa gesturi in fata senzorului. Ctrl+C pentru stop.\n")
+    print("Connected. Perform gestures in front of the sensor. Ctrl+C to stop.\n")
 
     frame_buffer = deque(maxlen=WINDOW_SIZE)
     ema_probs = np.ones(len(labels), dtype=np.float32) / len(labels)
