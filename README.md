@@ -1,6 +1,6 @@
 # RadarSense
 
-Real-time radar gesture recognition system built with the Acconeer A111 radar sensor and a TinyCNN-based classification pipeline.
+Real-time radar gesture recognition system built with the SparkFun Acconeer A111 radar sensor and a TinyCNN-based classification pipeline.
 
 RadarSense combines radar signal acquisition, machine learning inference, gesture stabilization, and a live web dashboard into a single end-to-end system.
 
@@ -36,7 +36,7 @@ The current model recognizes the following classes:
 ## System Architecture
 
 ```text
-Acconeer A111 Radar
+Sparkfun Acconeer A111 Radar
         │
         ▼
  Raspberry Pi
@@ -85,7 +85,7 @@ RadarSense
 
 ## Hardware
 
-* Acconeer A111 radar sensor
+* SparkFun Acconeer A111 Pulsed Coherent Radar Sensor
 * Raspberry Pi 4
 * Windows/Linux host computer
 
