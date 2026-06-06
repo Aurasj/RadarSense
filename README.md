@@ -1,55 +1,67 @@
 # RadarSense
 
-Real-time radar gesture recognition system built with the SparkFun Acconeer A111 radar sensor and a TinyCNN-based classification pipeline.
+Real-time radar gesture recognition system built around the **SparkFun Acconeer A111 Pulsed Coherent Radar Sensor** and a custom **TinyCNN-based inference pipeline**.
 
-RadarSense combines radar signal acquisition, machine learning inference, gesture stabilization, and a live web dashboard into a single end-to-end system.
+RadarSense combines radar signal acquisition, machine learning inference, gesture stabilization, Raspberry Pi deployment, and a live web dashboard into a complete end-to-end gesture recognition system.
 
 ---
 
-## Features
+## Overview
 
-* Real-time gesture recognition
-* TinyCNN inference engine
+RadarSense enables real-time hand gesture recognition using radar data instead of cameras.
+
+The system acquires radar frames from an Acconeer A111 sensor connected to a Raspberry Pi, processes them through a custom machine learning pipeline, and streams predictions to a web dashboard with live visualizations and event monitoring.
+
+---
+
+## Highlights
+
+* Real-time radar gesture recognition
+* Custom TinyCNN inference engine
 * FSM-based gesture stabilization
-* Live radar waveform visualization
-* Live waterfall/heatmap visualization
+* Raspberry Pi deployment
+* Live dashboard built with Flask and Socket.IO
+* Radar waveform visualization
+* Waterfall / heatmap visualization
 * Session statistics and event logging
-* UDP gesture event broadcasting
-* Raspberry Pi + Acconeer A111 integration
-* Model evaluation report dashboard
+* UDP event broadcasting for external applications
+* Training and evaluation pipeline
+* Model performance reporting
 
 ---
 
 ## Supported Gestures
 
-The current model recognizes the following classes:
+The current model recognizes six gesture classes:
 
-* none
-* hold
-* push
-* pull
-* tap
-* wave
+| Class |
+| ----- |
+| none  |
+| hold  |
+| push  |
+| pull  |
+| tap   |
+| wave  |
 
 ---
 
 ## System Architecture
 
 ```text
-Sparkfun Acconeer A111 Radar
-        │
-        ▼
- Raspberry Pi
- (Exploration Server)
-        │
-        ▼
- RadarSense Server
- (Flask + Socket.IO)
-        │
- ┌──────┴──────┐
- ▼             ▼
-Dashboard    UDP Events
-(Web UI)     (Unity / External Apps)
+SparkFun Acconeer A111 Radar
+            │
+            ▼
+      Raspberry Pi
+   (Exploration Server)
+            │
+            ▼
+     RadarSense Server
+    (Flask + Socket.IO)
+            │
+     ┌──────┴──────┐
+     ▼             ▼
+ Dashboard     UDP Events
+   (Web UI)    (Unity / External Apps)
 ```
 
 ---
@@ -65,8 +77,6 @@ RadarSense
 ├── cfg
 │   ├── gesture_cnn_boss.pt
 │   └── gesture_cnn_meta.json
-├── docs
-├── logs
 ├── training
 │   ├── onnx
 │   ├── reports
@@ -91,9 +101,9 @@ RadarSense
 
 ---
 
-## Runtime Dependencies
+## Installation
 
-Install runtime dependencies:
+Runtime dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -109,7 +119,7 @@ pip install -r requirements_train.txt
 
 ## Running the System
 
-Start the Flask server:
+Start the RadarSense server:
 
 ```bash
 python app/server.py
@@ -125,7 +135,7 @@ http://localhost:5002
 
 ## UDP Event Monitor
 
-Run the terminal monitor in a separate window:
+Run the gesture event monitor in a separate terminal:
 
 ```bash
 python app/gesture_monitor.py
@@ -133,9 +143,9 @@ python app/gesture_monitor.py
 
 ---
 
-## Training
+## Dataset & Training
 
-Record dataset samples:
+Record radar samples:
 
 ```bash
 python training/record_envelope_dataset.py
@@ -153,6 +163,18 @@ Evaluate the model:
 python training/test_model.py
 ```
 
+Training artifacts are stored in:
+
+```text
+training/reports/
+```
+
+Dashboard report assets are stored in:
+
+```text
+web/static/reports/
+```
+
 ---
 
 ## Model Performance
@@ -163,7 +185,7 @@ Validation Accuracy:
 99.56%
 ```
 
-Classes:
+Recognized Classes:
 
 ```text
 none
@@ -174,19 +196,14 @@ tap
 wave
 ```
 
-Training and evaluation artifacts are available in:
+The dashboard includes:
 
-```text
-training/reports/
-web/static/reports/
-```
+* Classification report
+* Confusion matrix
+* Accuracy curve
+* Loss curve
 
----
 
 ## License
 
 This project was developed for academic and research purposes.
-
-```
-Aurasj
-```
