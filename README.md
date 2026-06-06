@@ -188,4 +188,5 @@ web/static/reports/
 This project was developed for academic and research purposes.
 
 ```
+Aurasj
 ```
