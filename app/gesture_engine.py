@@ -29,8 +29,8 @@ EMA_ALPHA = 0.70    # smoothing factor for probability averaging (higher = more 
 
 # Minimum confidence required before a gesture is even considered.
 MIN_CONF = {
-    "push":    0.40,
-    "pull":    0.40,
+    "push":    0.60,
+    "pull":    0.60,
     "tap":     0.45,
     "wave":    0.55,   # stricter threshold so wave doesn't steal tap or hold
     "hold":    0.45,   # hand hold reflects less than a phone, so lower threshold

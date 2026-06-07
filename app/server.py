@@ -84,6 +84,48 @@ frame_buffer: deque = deque(maxlen=WINDOW_SIZE)
 # Single UDP socket used for both Unity and the local event monitor.
 _udp: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+# ── UDP intent filter (TAP / WAVE dedup + PUSH/PULL quiet window) ────────────
+# HOLD is unrestricted — Unity uses repeated HOLD events for forward movement.
+# PUSH/PULL are sent immediately unless inside the post-primary quiet window;
+# Unity's own intent layer handles false PUSH/PULL before HOLD.
+
+UDP_EVENT_SUPPRESS_INTERVAL: dict = {
+    "tap":  1.25,   # increased from 1.00 — still occasionally double-fires in live testing
+    "wave": 1.25,   # unchanged
+}
+
+# How long to suppress PUSH/PULL immediately after a primary gesture (HOLD/TAP/WAVE).
+STEP_QUIET_AFTER_PRIMARY = 0.30   # seconds
+
+_last_udp_event_ts: dict = {}
+
+# Timestamp until which PUSH/PULL are suppressed (set after each primary gesture).
+_step_quiet_until_ts: float = 0.0
+
+
+def _should_send_udp_event(gesture: str) -> bool:
+    """Return True if the gesture UDP broadcast should proceed.
+
+    TAP and WAVE are rate-limited to avoid duplicate events from a single
+    physical action.  All other gestures (HOLD, PUSH, PULL …) pass through
+    unconditionally.
+    """
+    gesture = gesture.lower()
+    interval = UDP_EVENT_SUPPRESS_INTERVAL.get(gesture)
+
+    if interval is None:          # not a suppressed gesture → always send
+        return True
+
+    now  = time.monotonic()
+    last = _last_udp_event_ts.get(gesture, -999.0)
+
+    if now - last < interval:     # still within the quiet window → suppress
+        return False
+
+    _last_udp_event_ts[gesture] = now
+    return True
+
+
 # Thread control globals
 _radar_connected   = False
 _connected_clients = 0
@@ -218,6 +260,7 @@ def _radar_loop() -> None:
     and UDP targets. Stops when _stop_event is set.
     """
     global _radar_connected, _active_client
+    global _step_quiet_until_ts
 
     client = AcconeerExplorationClient()
     _active_client = client
@@ -307,10 +350,35 @@ def _radar_loop() -> None:
 
         # Forward confirmed gesture over UDP.
         # is_event is True on exactly one frame per gesture.
+        # Dashboard/browser prediction is emitted above and is NOT affected by
+        # this filter — it always receives the raw is_event value from the engine.
         if is_event and gesture != "none":
-            if VERBOSE_GESTURES:
-                print(f"[Server] Event → {gesture.upper()}  conf={confidence:.3f}")
-            _udp_send(gesture)
+            now = time.monotonic()
+            g   = gesture.lower()
+
+            if g in ("push", "pull"):
+                # ── PUSH / PULL: quiet-window guard only ────────────────────
+                # No delay — sent immediately unless a primary gesture just fired.
+                if now < _step_quiet_until_ts:
+                    if VERBOSE_GESTURES:
+                        print(f"[Server] Suppressed {g.upper()} during quiet window")
+                else:
+                    if VERBOSE_GESTURES:
+                        print(f"[Server] Event → {g.upper()}  conf={confidence:.3f}")
+                    _udp_send(g)
+
+            else:
+                # ── HOLD / TAP / WAVE: primary gestures ─────────────────────
+                # Open a quiet window so stray PUSH/PULL after this gesture are ignored.
+                _step_quiet_until_ts = now + STEP_QUIET_AFTER_PRIMARY
+
+                # Apply TAP/WAVE dedup; HOLD passes through unconditionally.
+                if _should_send_udp_event(g):
+                    if VERBOSE_GESTURES:
+                        print(f"[Server] Event → {g.upper()}  conf={confidence:.3f}")
+                    _udp_send(g)
+                elif VERBOSE_GESTURES:
+                    print(f"[Server] Suppressed duplicate {g.upper()}")
 
         # Yield so we don't pin the CPU. The SDK's get_next() is already blocking.
         time.sleep(0)
