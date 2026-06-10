@@ -1,0 +1,6 @@
+# Arduino bridge dependencies
+# Install separately — not part of the core RadarSense runtime.
+#
+#   pip install -r examples/arduino/requirements_arduino.txt
+#
+pyserial>=3.5
